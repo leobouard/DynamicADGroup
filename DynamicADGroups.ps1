@@ -227,39 +227,43 @@ $([System.String]($compare | Where-Object {!$_.Status} | Select-Object Group,Ide
 
 end {
 
-    # Create mail body
-    $content = "<h2>Dynamic groups updates</h2><p>The synthesis of the processing of the JSON file by the PowerShell script 'DynamicADGroup.ps1' for the automatic populating of Active Directory groups</p>"
-    if ($groupsNotFound.Count -ne 0) { 
-        $content += "<h3>Groups not found</h3><p>Here's the list of groups that couldn't be found in Active Directory using the provided name in the JSON file:<ul>"
-        $groupsNotFound.Group | ForEach-Object { $content += "<li>$_</li>" }
-        $content += "</ul></p>"
-    }
-    ($finalReport | Sort-Object Group).Group | Get-Unique | Foreach-Object {
-        $groupName = $_
-        $content += "<h3>$groupName</h3>"
-        $content += [System.String]($finalReport | Where-Object {$_.Group -eq $groupName} | ConvertTo-Html -Fragment)
-        Remove-Variable groupName,description -ErrorAction SilentlyContinue
-    }
-    $content = $content -replace "&lt;","<"
-    $content = $content -replace "&gt;",">"
-    $body = [System.String](Get-Content -Path "$PSScriptRoot\body.html" -Encoding UTF8)
-    $body = $body -replace "{{ content }}",$content
-
     Stop-Transcript
 
-    # Send mail message
-    $mailParams = @{
-        Body        = $body
-        BodyAsHtml  = $True
-        Encoding    = "UTF8"
-        From        = $FromAddress
-        Subject     = "DynamicADGroups $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
-        SmtpServer  = $SmtpServer
-        To          = $ReportTo
+    if (($finalReport | Where-Object {$_.Status -notlike "*Kept*"} | Measure-Object).Count -gt 0) {
+
+        # Create mail body
+        $content = "<h2>Dynamic groups updates</h2><p>The synthesis of the processing of the JSON file by the PowerShell script 'DynamicADGroup.ps1' for the automatic populating of Active Directory groups</p>"
+        if ($groupsNotFound.Count -ne 0) { 
+            $content += "<h3>Groups not found</h3><p>Here's the list of groups that couldn't be found in Active Directory using the provided name in the JSON file:<ul>"
+            $groupsNotFound.Group | ForEach-Object { $content += "<li>$_</li>" }
+            $content += "</ul></p>"
+        }
+        ($finalReport | Sort-Object Group).Group | Get-Unique | Foreach-Object {
+            $groupName = $_
+            $content += "<h3>$groupName</h3>"
+            $content += [System.String]($finalReport | Where-Object {$_.Group -eq $groupName} | ConvertTo-Html -Fragment)
+            Remove-Variable groupName,description -ErrorAction SilentlyContinue
+        }
+        $content = $content -replace "&lt;","<"
+        $content = $content -replace "&gt;",">"
+        $body = [System.String](Get-Content -Path "$PSScriptRoot\body.html" -Encoding UTF8)
+        $body = $body -replace "{{ content }}",$content
+
+        # Send mail message
+        $mailParams = @{
+            Body        = $body
+            BodyAsHtml  = $True
+            Encoding    = "UTF8"
+            From        = $FromAddress
+            Subject     = "DynamicADGroups $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
+            SmtpServer  = $SmtpServer
+            To          = $ReportTo
+        }
+        if ((Test-Path -Path $logPath) -eq $true) { $mailParams.Attachments = Get-Item -Path $logPath }
+        if ($TestRecipient) { $mailParams.To = $TestRecipient }
+        Write-Verbose -Message "Send final report to $([System.String]($mailParams.To))"
+        Send-MailMessage @mailParams
+        
     }
-    if ((Test-Path -Path $logPath) -eq $true) { $mailParams.Attachments = Get-Item -Path $logPath }
-    if ($TestRecipient) { $mailParams.To = $TestRecipient }
-    Write-Verbose -Message "Send final report to $([System.String]($mailParams.To))"
-    Send-MailMessage @mailParams
 
 }
