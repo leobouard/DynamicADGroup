@@ -79,7 +79,7 @@ process {
             if ($_.Filter) {
                 $filter = $_.Filter
                 $users = $users | Where-Object {Invoke-Expression $filter}
-                Remove-Variable filter -ErrorAction SilentlyContinue
+                Remove-Variable filter
             }
             
             # Compare filter results vs. current group members
@@ -108,13 +108,13 @@ process {
                         $compare.Add([PSCustomObject]@{
                             Identity     = $sam
                             Name         = $member.Name
-                            Company       = $member.Company
+                            Company      = $member.Company
                             Title        = $member.Title
                             Department   = $member.Department
                             EmailAddress = $member.EmailAddress
                             Action       = "Remove"
                         })
-                        Remove-Variable sam,member -ErrorAction SilentlyContinue
+                        Remove-Variable sam,member
                     }
                 }
 
@@ -137,7 +137,7 @@ process {
                             EmailAddress = $member.EmailAddress
                             Action       = $action
                         })
-                        Remove-Variable sam,member,action -ErrorAction SilentlyContinue
+                        Remove-Variable sam,member,action
                     }
                 }
 
@@ -145,11 +145,11 @@ process {
             if ($null -ne $_.Exceptions) {
                 $exceptions = $_.Exceptions
                 $compare | Where-Object {$_.Identity -in $exceptions -and $_.Action -eq "Remove"} | Foreach-Object {$_.Action = "Keep"}
-                Remove-Variable exceptions -ErrorAction SilentlyContinue
+                Remove-Variable exceptions
             }
 
             Write-Output -InputObject "Processing group $($_.Group)"
-            Write-Output -InputObject ($compare | Format-Table)
+            Write-Output -InputObject ($compare | Select-Object Identity,Name,Action | Format-Table)
 
             # Add & remove group members
             $compare | Where-Object {$_.Action -ne "Keep"} | ForEach-Object {
@@ -181,7 +181,7 @@ process {
                 }
 
                 $_ | Add-Member -MemberType NoteProperty -Name Status -Value "<font color=$colorHex>$text</font>" -Force
-                Remove-Variable colorHex,text -ErrorAction SilentlyContinue
+                Remove-Variable colorHex,text
             }
 
             $compare = $compare | Select-Object @{N="Group";E={$groupName}},Name,Title,Department,EmailAddress,Status
@@ -194,9 +194,9 @@ process {
                 $content = @"
 <h2>$groupName</h2>
 <h3>Modified members</h3>
-$([System.String]($compare | Where-Object {$_.Status} | ConvertTo-Html -Fragment))
+$([System.String]($compare | Where-Object {$_.Status} | Select-Object Name,Title,Department,Status | ConvertTo-Html -Fragment))
 <h3>Members retained</h3>
-$([System.String]($compare | Where-Object {!$_.Status} | Select-Object Group,Name,Title,Department,@{N="Status";E={"Kept"}} | ConvertTo-Html -Fragment))
+$([System.String]($compare | Where-Object {!$_.Status} | Select-Object Name,Title,Department,@{N="Status";E={"Kept"}} | ConvertTo-Html -Fragment))
 "@
                 $content = $content -replace "&lt;","<"
                 $content = $content -replace "&gt;",">"
@@ -217,7 +217,7 @@ $([System.String]($compare | Where-Object {!$_.Status} | Select-Object Group,Nam
                 Write-Verbose -Message "Send group report to $([System.String]($mailParams.To))"
                 Send-MailMessage @mailParams
 
-                Remove-Variable content,body,mailParams -ErrorAction SilentlyContinue
+                Remove-Variable content,body,mailParams
             }
 
             $compare | Where-Object {$_.Status} | ForEach-Object { $finalReport.Add($_) }
@@ -241,8 +241,8 @@ end {
         ($finalReport | Sort-Object Group).Group | Get-Unique | Foreach-Object {
             $groupName = $_
             $content += "<h3>$groupName</h3>"
-            $content += [System.String]($finalReport | Where-Object {$_.Group -eq $groupName} | ConvertTo-Html -Fragment)
-            Remove-Variable groupName,description -ErrorAction SilentlyContinue
+            $content += [System.String]($finalReport | Where-Object {$_.Group -eq $groupName} | Select-Object Name,EmailAddress,Title,Department,Status | ConvertTo-Html -Fragment)
+            Remove-Variable groupName,description
         }
         $content = $content -replace "&lt;","<"
         $content = $content -replace "&gt;",">"
