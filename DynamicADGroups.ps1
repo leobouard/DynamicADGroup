@@ -196,7 +196,7 @@ process {
 <h3>Modified members</h3>
 $([System.String]($compare | Where-Object {$_.Status} | ConvertTo-Html -Fragment))
 <h3>Members retained</h3>
-$([System.String]($compare | Where-Object {!$_.Status} | Select-Object Group,Identity,@{N="Status";E={"Kept"}} | ConvertTo-Html -Fragment))
+$([System.String]($compare | Where-Object {!$_.Status} | Select-Object Group,Name,Title,Department,@{N="Status";E={"Kept"}} | ConvertTo-Html -Fragment))
 "@
                 $content = $content -replace "&lt;","<"
                 $content = $content -replace "&gt;",">"
