@@ -245,6 +245,8 @@ end {
     $body = [System.String](Get-Content -Path "$PSScriptRoot\body.html" -Encoding UTF8)
     $body = $body -replace "{{ content }}",$content
 
+    Stop-Transcript
+
     # Send mail message
     $mailParams = @{
         Body        = $body
@@ -260,6 +262,4 @@ end {
     Write-Verbose -Message "Send final report to $([System.String]($mailParams.To))"
     Send-MailMessage @mailParams
 
-    Stop-Transcript
-    
 }
