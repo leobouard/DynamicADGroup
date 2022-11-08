@@ -229,7 +229,7 @@ end {
 
     Stop-Transcript
 
-    if (($finalReport | Where-Object {$_.Status -notlike "*Kept*"} | Measure-Object).Count -gt 0) {
+    if (($finalReport | Measure-Object).Count -gt 0) {
 
         # Create mail body
         $content = "<h2>Dynamic groups updates</h2><p>The synthesis of the processing of the JSON file by the PowerShell script 'DynamicADGroup.ps1' for the automatic populating of Active Directory groups</p>"
@@ -263,7 +263,7 @@ end {
         if ($TestRecipient) { $mailParams.To = $TestRecipient }
         Write-Verbose -Message "Send final report to $([System.String]($mailParams.To))"
         Send-MailMessage @mailParams
-        
+
     }
 
 }
