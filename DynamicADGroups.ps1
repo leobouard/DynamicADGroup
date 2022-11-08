@@ -157,7 +157,7 @@ process {
                 if ($_.Action -eq "Add") {
                     Write-Verbose -Message "Add $($_.Identity) to group $($group.Name)"
                     try { 
-                        Add-ADGroupMember -Identity $group -Members $_.Identity -Confirm:$false -WhatIf:$WhatIf
+                        Add-ADGroupMember -Identity $group -Members $_.Identity -Confirm:$false
                         $colorHex = "008000"
                         $text     = "Added"
                     } catch {
@@ -170,7 +170,7 @@ process {
                 if ($_.Action -eq "Remove") {
                     Write-Verbose -Message "Remove $($_.Identity) from group $($group.Name)"
                     try {
-                        Remove-ADGroupMember -Identity $group -Members $_.Identity -Confirm:$false -WhatIf:$WhatIf
+                        Remove-ADGroupMember -Identity $group -Members $_.Identity -Confirm:$false
                         $colorHex = "518EC9"
                         $text     = "Removed"
                     } catch {
