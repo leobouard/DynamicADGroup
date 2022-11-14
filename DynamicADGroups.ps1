@@ -72,7 +72,12 @@ process {
 
             # Get all users on searchbase
             if ($_.SearchBase) { 
-                if ($_.SearchBase -notlike "OU=*") { $searchBase = 'OU=' + $_.SearchBase + ',' + $DefaultSearchBase }
+                if ($_.SearchBase -notlike "OU=*") {
+                    $searchBase = 'OU=' + $_.SearchBase + ',' + $DefaultSearchBase
+                } else {
+                    $searchBase = $_.SearchBase
+                }
+                Write-Verbose -Message "Using custom searchbase: $searchBase"
             } else { $searchBase = $DefaultSearchBase }
             $users = $allUsers | Where-Object {$_.DistinguishedName -match $searchBase}
 
