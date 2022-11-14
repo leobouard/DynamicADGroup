@@ -93,7 +93,7 @@ Des adresses emails peuvent être indiquées pour chaque groupe afin d'informer 
     {
         "Group":  "GG-CONTOSO-ITTEAM",
         "Preset":  "EnabledOnly",
-        "Filter":  "$_.Title -in 'IT Technician','IT Manager'",
+        "Filter":  "$_.Title -in 'IT Technician','IT Consultant'",
         "SearchBase":  "CONTOSO",
         "Exceptions":  [
             "jack.black",
@@ -121,6 +121,7 @@ DefaultSearchBase | Racine du domaine | Périmètre de recherche des utilisateur
 TestRecipient | | Destinataire pour toutes les communications en cas de test (les actions d'ajout et suppression seront quand-même effectuées)
 SmtpServer | smtp.contoso.com | Serveur de messagerie à utiliser
 FromAddress | <noreply@contoso.com> | Adresse d'expédition
+LogHistory | 15 | Nombre de jours maximum pour la conservation des fichiers de journalisation
 
 Les paramètres obligatoires sont indiqués en gras.
 
