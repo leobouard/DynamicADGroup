@@ -14,7 +14,9 @@ Param(
 
 begin {
 
-    $logPath = "$PSScriptRoot\logs\DynamicADGroups_$(Get-Date -Format 'yyyy-MM-dd-HHmmss').txt"
+    $JsonFileName = (Get-Item -Path $JsonFile).BaseName -replace ' ','-'
+
+    $logPath = "$PSScriptRoot\logs\DynamicADGroups_$JsonFileName`_$(Get-Date -Format 'yyyy-MM-dd-HHmmss').txt"
     Start-Transcript -Path $logPath
     $PSDefaultParameterValues = @{
         "Import-Module:Verbose"            = $false
@@ -27,7 +29,7 @@ begin {
     
     # Remove old log files
     Get-ChildItem -Path $PSScriptRoot\logs -Recurse | Where-Object {
-        $_.BaseName -like "DynamicADGroups_*" -and 
+        $_.BaseName -like "DynamicADGroups_$JsonFileName`*" -and 
         $_.Extension -eq ".txt" -and 
         $_.LastWriteTime -lt (Get-Date).AddDays(-$LogHistory)
     } | Remove-Item -Force -Confirm:$false -Verbose
@@ -268,7 +270,7 @@ end {
             BodyAsHtml  = $True
             Encoding    = "UTF8"
             From        = $FromAddress
-            Subject     = "DynamicADGroups $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
+            Subject     = "$JsonFileName - DynamicADGroups $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
             SmtpServer  = $SmtpServer
             To          = $ReportTo
         }
