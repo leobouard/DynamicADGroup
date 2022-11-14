@@ -8,7 +8,8 @@ Param(
     [System.String]$DefaultSearchBase = (Get-ADDomain).DistinguishedName,
     [System.String]$TestRecipient,
     [System.String]$SmtpServer = "smtp.contoso.com",
-    [System.String]$FromAddress = "noreply@contoso.com"
+    [System.String]$FromAddress = "noreply@contoso.com",
+    [System.Int32]$LogHistory = 15
 )
 
 begin {
@@ -24,6 +25,13 @@ begin {
         "Remove-ADGroupMember:ErrorAction" = "Stop"
     }
     
+    # Remove old log files
+    Get-ChildItem -Path $PSScriptRoot\logs -Recurse | Where-Object {
+        $_.BaseName -like "DynamicADGroups_*" -and 
+        $_.Extension -eq ".txt" -and 
+        $_.LastWriteTime -lt (Get-Date).AddDays(-$LogHistory)
+    } | Remove-Item -Force -Confirm:$false -Verbose
+
     # Get all users from Active Directory
     Import-Module ActiveDirectory
     try {
