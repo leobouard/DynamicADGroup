@@ -62,7 +62,7 @@ process {
         # Get Active Directory group
         $groupName = $_.Group
         Write-Verbose -Message "Getting Active Directory group '$($_.Group)'"
-        $group = Get-ADGroup -Filter {Name -eq $groupName}
+        $group = Get-ADGroup -Filter {Name -eq $groupName -or DisplayName -eq $groupName}
         if ($null -eq $group) { 
             Write-Error -Exception "Couldn't found group '$($_.Group)' in Active Directory!"
             $groupsNotFound.Add($_)
