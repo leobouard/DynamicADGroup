@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 #Requires -Modules @{ModuleName="ActiveDirectory";ModuleVersion="1.0.1.0"}
 
 [CmdletBinding(SupportsShouldProcess=$True)]
