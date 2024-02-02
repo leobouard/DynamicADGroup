@@ -16,13 +16,12 @@ Cependant, il est possible de requêter sur tous les attributs Active Directory 
 
 Quelques limitations sont a connaitre :
 
-1. Ne convient pas aux groupes contenant plus de 5000 membres directs (limitation liée à PowerShell)
-2. Ne met à jour que les membres directs des groupes
-3. Ne doit pas être utilisé pour peupler automatiquement des groupes à privilèges (pour des raisons de sécurité)
+1. Ne met à jour que les membres directs des groupes (utilisateurs uniquement)
+2. Ne doit pas être utilisé pour peupler automatiquement des groupes à privilèges (pour des raisons de sécurité)
 
 ### Compatibilité
 
-Ce script est compatible avec les groupes existants, qu'importe leur type (domaine local, sécurité globale, sécurité de distribution, universel...). 
+Ce script est compatible avec les groupes existants, qu'importe leur type (domaine local, sécurité globale, sécurité de distribution, universel...).
 
 ## Fonctionnement
 
@@ -45,7 +44,7 @@ Les propriétés obligatoires sont indiquées en gras.
 
 Nom | Description
 --- | -----------
-Messaging | Ne garde que les comptes Active Directory actif avec une boite aux lettres active (RemoteMailbox)
+Messaging | Ne garde que les comptes Active Directory actif avec une adresse email
 EnabledOnly | Ne garde que les comptes Active Directory actif (Enabled = True)
 DisabledOnly | Ne garde que les comptes Active Directory désactivés (Enabled = False)
 

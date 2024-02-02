@@ -70,7 +70,9 @@ process {
 
             # Get Active Directory group members
             Write-Verbose -Message "Getting group members (direct membership only)"
-            $groupMembers = Get-ADGroupMember -Identity $group | Where-Object {$_.objectClass -eq "user"}
+            $groupMembers = (Get-ADGroup -Identity $group -Properties Members).Members | ForEach-Object { Get-ADObject $_ -Properties SamAccountName -ErrorAction SilentlyContinue }
+            $groupMembers = $groupMembers | Where-Object {$_.objectClass -eq 'user'}
+            Write-Verbose -Message "User members found: $(($groupMembers | Measure-Object).Count)"
 
             # Get all users on searchbase
             if ($_.SearchBase) { 
@@ -85,7 +87,7 @@ process {
 
             # Filter out using presets
             switch ($_.Preset) {
-                "Messaging"    { $users = $users | Where-Object {$_.Enabled -eq $true -and $_.msExchRecipientTypeDetails -eq 2147483648} }
+                "Messaging"    { $users = $users | Where-Object {$_.Enabled -eq $true -and $_.EmailAddress} }
                 "EnabledOnly"  { $users = $users | Where-Object {$_.Enabled -eq $true} }
                 "DisabledOnly" { $users = $users | Where-Object {$_.Enabled -eq $false} }
             }
