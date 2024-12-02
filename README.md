@@ -91,7 +91,7 @@ Des adresses emails peuvent être indiquées pour chaque groupe afin d'informer 
 [
     {
         "Group":  "GG-CONTOSO-ITTEAM",
-        "Preset":  "EnabledOnly",
+        "Preset":  "UserEnabled",
         "Filter":  "$_.Title -in 'IT Technician','IT Consultant'",
         "SearchBase":  "CONTOSO",
         "Exceptions":  [
